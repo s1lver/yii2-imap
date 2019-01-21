@@ -36,7 +36,6 @@ use yii\base\InvalidConfigException;
  * ],
  * ~~~
 **/
-
 class Imap extends Mailbox
 {
     private $_connection = [];
@@ -54,7 +53,8 @@ class Imap extends Mailbox
     }
 
     /**
-     * @return array
+     * @return array|Imap
+     * @throws Exception
      */
     public function getConnection()
     {
@@ -62,6 +62,7 @@ class Imap extends Mailbox
             return $this->_connection;
         }
         $this->_connection = $this->createConnection();
+
         return $this->_connection;
     }
 
@@ -82,6 +83,7 @@ class Imap extends Mailbox
             }
             $this->attachmentsDir = rtrim(realpath($this->attachmentsDir), '\\/');
         }
+
         return $this;
     }
 }

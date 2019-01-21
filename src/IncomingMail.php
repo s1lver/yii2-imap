@@ -1,66 +1,84 @@
 <?php
+/**
+ *Copyright (c) 2012 by Barbushin Sergey <barbushin@gmail.com>.
+ *All rights reserved.
+ */
 
 namespace roopz\imap;
 
 /**
-   *Copyright (c) 2012 by Barbushin Sergey <barbushin@gmail.com>.
-   *All rights reserved.
-*/
+ * Class IncomingMail
+ * @package roopz\imap
+ */
+class IncomingMail
+{
+    public $id;
+    public $date;
+    public $subject;
 
-class IncomingMail {
+    public $fromName;
+    public $fromAddress;
 
-	public $id;
-	public $date;
-	public $subject;
+    public $to = array();
+    public $toString;
+    public $cc = array();
+    public $replyTo = array();
 
-	public $fromName;
-	public $fromAddress;
+    public $textPlain;
+    public $textHtml;
+    /** @var IncomingMailAttachment[] */
+    protected $attachments = array();
 
-	public $to = array();
-	public $toString;
-	public $cc = array();
-	public $replyTo = array();
+    /**
+     * @param IncomingMailAttachment $attachment
+     */
+    public function addAttachment(IncomingMailAttachment $attachment)
+    {
+        $this->attachments[$attachment->id] = $attachment;
+    }
 
-	public $textPlain;
-	public $textHtml;
-	/** @var IncomingMailAttachment[] */
-	protected $attachments = array();
+    /**
+     * @return IncomingMailAttachment[]
+     */
+    public function getAttachments()
+    {
+        return $this->attachments;
+    }
 
-	public function addAttachment(IncomingMailAttachment $attachment) {
-		$this->attachments[$attachment->id] = $attachment;
-	}
+    /**
+     * Get array of internal HTML links placeholders
+     * @return array attachmentId => link placeholder
+     */
+    public function getInternalLinksPlaceholders()
+    {
+        return preg_match_all('/=["\'](ci?d:([\w\.%*@-]+))["\']/i', $this->textHtml, $matches) ? array_combine($matches[2], $matches[1]) : array();
+    }
 
-	/**
-	 * @return IncomingMailAttachment[]
-	 */
-	public function getAttachments() {
-		return $this->attachments;
-	}
+    /**
+     * @param $baseUri
+     * @return mixed
+     */
+    public function replaceInternalLinks($baseUri)
+    {
+        $baseUri = rtrim($baseUri, '\\/') . '/';
+        $fetchedHtml = $this->textHtml;
+        foreach($this->getInternalLinksPlaceholders() as $attachmentId => $placeholder) {
+            if(isset($this->attachments[$attachmentId])) {
+                $fetchedHtml = str_replace($placeholder, $baseUri . basename($this->attachments[$attachmentId]->filePath), $fetchedHtml);
+            }
+        }
 
-	/**
-	 * Get array of internal HTML links placeholders
-	 * @return array attachmentId => link placeholder
-	 */
-	public function getInternalLinksPlaceholders() {
-		return preg_match_all('/=["\'](ci?d:([\w\.%*@-]+))["\']/i', $this->textHtml, $matches) ? array_combine($matches[2], $matches[1]) : array();
-
-	}
-
-	public function replaceInternalLinks($baseUri) {
-		$baseUri = rtrim($baseUri, '\\/') . '/';
-		$fetchedHtml = $this->textHtml;
-		foreach($this->getInternalLinksPlaceholders() as $attachmentId => $placeholder) {
-			if(isset($this->attachments[$attachmentId])) {
-				$fetchedHtml = str_replace($placeholder, $baseUri . basename($this->attachments[$attachmentId]->filePath), $fetchedHtml);
-			}
-		}
-		return $fetchedHtml;
-	}
+        return $fetchedHtml;
+    }
 }
 
-class IncomingMailAttachment {
-
-	public $id;
-	public $name;
-	public $filePath;
+/**
+ * Class IncomingMailAttachment
+ * @package roopz\imap
+ */
+class IncomingMailAttachment
+{
+    public $id;
+    public $name;
+    public $filePath;
 }
