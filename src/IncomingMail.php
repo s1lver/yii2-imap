@@ -62,8 +62,8 @@ class IncomingMail
     {
         $baseUri = rtrim($baseUri, '\\/') . '/';
         $fetchedHtml = $this->textHtml;
-        foreach($this->getInternalLinksPlaceholders() as $attachmentId => $placeholder) {
-            if(isset($this->attachments[$attachmentId])) {
+        foreach ($this->getInternalLinksPlaceholders() as $attachmentId => $placeholder) {
+            if (isset($this->attachments[$attachmentId])) {
                 $fetchedHtml = str_replace($placeholder, $baseUri . basename($this->attachments[$attachmentId]->filePath), $fetchedHtml);
             }
         }

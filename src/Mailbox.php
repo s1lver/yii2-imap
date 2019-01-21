@@ -237,6 +237,7 @@ class Mailbox extends Component
      * Add the flag \Seen to a mail.
      * @param $mailId
      * @return bool
+     * @throws Exception
      */
     public function markMailAsRead($mailId)
     {
@@ -247,6 +248,7 @@ class Mailbox extends Component
      * Remove the flag \Seen from a mail.
      * @param $mailId
      * @return bool
+     * @throws Exception
      */
     public function markMailAsUnread($mailId)
     {
@@ -257,6 +259,7 @@ class Mailbox extends Component
      * Add the flag \Flagged to a mail.
      * @param $mailId
      * @return bool
+     * @throws Exception
      */
     public function markMailAsImportant($mailId)
     {
@@ -267,6 +270,7 @@ class Mailbox extends Component
      * Add the flag \Seen to a mails.
      * @param array $mailId
      * @return bool
+     * @throws Exception
      */
     public function markMailsAsRead(array $mailId)
     {
@@ -277,6 +281,7 @@ class Mailbox extends Component
      * Remove the flag \Seen from some mails.
      * @param array $mailId
      * @return bool
+     * @throws Exception
      */
     public function markMailsAsUnread(array $mailId)
     {
@@ -348,7 +353,7 @@ class Mailbox extends Component
     {
         $mails = imap_fetch_overview($this->getImapStream(), implode(',', $mailsIds), FT_UID);
         if (is_array($mails) && count($mails)) {
-            foreach($mails as &$mail) {
+            foreach ($mails as &$mail) {
                 if (isset($mail->subject)) {
                     $mail->subject = $this->decodeMimeStr($mail->subject, $this->serverEncoding);
                 }
@@ -633,8 +638,8 @@ class Mailbox extends Component
      */
     public function isUrlEncoded($string)
     {
-        $hasInvalidChars = preg_match( '#[^%a-zA-Z0-9\-_\.\+]#', $string );
-        $hasEscapedChars = preg_match( '#%[a-zA-Z0-9]{2}#', $string );
+        $hasInvalidChars = preg_match('#[^%a-zA-Z0-9\-_\.\+]#', $string);
+        $hasEscapedChars = preg_match('#%[a-zA-Z0-9]{2}#', $string);
 
         return !$hasInvalidChars && $hasEscapedChars;
     }
